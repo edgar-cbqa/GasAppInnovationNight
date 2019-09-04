@@ -2,9 +2,11 @@ import { AsyncStorage } from 'react-native';
 
 const _userKey = '@rmfanapp:user';
 
-export const saveUser = async(uid) => {
+export const saveUser = async(accessKey, secretKey, token) => {
     try {
-        await AsyncStorage.setItem(_userKey, uid);
+        const data = JSON.stringify({accessKey, secretKey, token});
+        debugger;
+        await AsyncStorage.setItem(_userKey, data);
     } catch(error) {
         debugger;
         return undefined;
@@ -14,7 +16,7 @@ export const saveUser = async(uid) => {
 export const getUser = () => {
     return new Promise(async(resolve) => {
         try {
-            const user = await AsyncStorage.getItem(_userKey);
+            const user = JSON.parse(await AsyncStorage.getItem(_userKey));
             resolve(user);
         }catch(error) {
             resolve(undefined);

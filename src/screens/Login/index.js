@@ -11,21 +11,29 @@ import {
 } from 'native-base';
 import styles from './styles';
 import {loginUser, signupUser} from '../../data/LoginApi';
-import {saveUser} from '../../data/UserRepository';
+import {saveUser, getUser} from '../../data/UserRepository';
 
 export default class LoginScreen extends Component {
   constructor (props) {
     super (props);
     this.state = {
       email: 'edgar@mail.com',
-      password: '123456',
+      password: '12345678',
       isLoading: false,
     };
   }
 
-  saveUserAndRedirect = async uid => {
-    await saveUser (uid);
-    debugger;
+  componentDidMount() {
+    this.verifyUserSession();
+  }
+
+  verifyUserSession = async () => {
+    const userData = await getUser();
+    if(userData) await this.props.navigation.navigate ('Home'); 
+  }
+
+  saveUserAndRedirect = async ({ accessKey, secretKey, token }) => {
+    await saveUser (accessKey, secretKey, token);
     await this.props.navigation.navigate ('Home');
   };
 
@@ -35,12 +43,12 @@ export default class LoginScreen extends Component {
     this.setState ({isLoading: true}, () => {
       loginUser (email, password)
         .then (data => {
-          this.saveUserAndRedirect('test1');
+          this.saveUserAndRedirect(data);
         })
         .catch (() => {
           signupUser (email, password)
             .then (data => {
-              this.saveUserAndRedirect('test1');
+              this.saveUserAndRedirect(data);
             })
             .catch (() => {
               this.setState ({isLoading: false});
